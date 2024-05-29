@@ -1,0 +1,188 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="relative overflow-x-auto shadow-md">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th scope="col" class="px-6 py-3">Kode spesialis</th>
+                <th scope="col" class="px-6 py-3">Spesialis</th>
+                <th scope="col" class="px-6 py-3">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in spesialis %}
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ s.kd_spesialis }}</td>
+                <td class="px-6 py-4">{{ s.spesialis }}</td>
+                <td class="px-6 py-4 text-right flex flex-nowrap">
+                    <button class="bg-latte px-3 py-1 rounded-lg text-black mr-2 edit-button"
+                        data-kd-spesialis="{{ s.kd_spesialis }}"
+                        data-spesialis="{{ s.spesialis }}">
+                        Edit
+                    </button>
+                    <button class="bg-red-600 text-white px-3 py-1 rounded-lg delete-button" data-kd-spesialis="{{ s.kd_spesialis }}">Hapus</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Button -->
+<button id="add-button" class="bg-green-500 text-white px-4 py-2 rounded-lg mt-4">Tambah</button>
+
+<!-- Edit Form Modal -->
+<div id="editFormModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-500 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-8 rounded-md max-w-md w-full">
+        <h2 class="text-xl font-semibold mb-4">Edit spesialis</h2>
+        <form id="editForm" class="space-y-4">
+            <input type="hidden" name="kd_spesialis" id="kd_spesialis">
+            <div>
+                <label for="spesialis" class="block font-medium">Alamat spesialis</label>
+                <input type="text" name="spesialis" id="spesialis" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <button type="submit" class="bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700">Simpan Perubahan</button>
+                <button id="closeModalButton" type="button" class="ml-2 text-gray-600 font-medium py-2 px-4 rounded-md border border-gray-300 hover:text-gray-800">Tutup</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Form Modal -->
+<div id="addFormModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-500 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-8 rounded-md max-w-md w-full">
+        <h2 class="text-xl font-semibold mb-4">Tambah Spesialis</h2>
+        <form id="addForm" class="space-y-4">
+            <div>
+                <label for="kd_spesialis_add" class="block font-medium">Kode spesialis</label>
+                <input type="text" name="kd_spesialis" id="kd_spesialis_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="spesialis_add" class="block font-medium">Nama spesialis</label>
+                <input type="text" name="spesialis" id="spesialis_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <button type="submit" class="bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700">Tambah spesialis</button>
+                <button id="closeAddModalButton" type="button" class="ml-2 text-gray-600 font-medium py-2 px-4 rounded-md border border-gray-300 hover:text-gray-800">Tutup</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editButtons = document.querySelectorAll('.edit-button');
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        const addButton = document.getElementById('add-button');
+        const editFormModal = document.getElementById('editFormModal');
+        const addFormModal = document.getElementById('addFormModal');
+        const closeModalButton = document.getElementById('closeModalButton');
+        const closeAddModalButton = document.getElementById('closeAddModalButton');
+
+        editButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const kdSpesialis = this.getAttribute('data-kd-spesialis');
+                const spesialis = this.getAttribute('data-spesialis');
+
+                document.getElementById('kd_spesialis').value = kdSpesialis;
+                document.getElementById('spesialis').value = spesialis;
+
+                editFormModal.classList.remove('hidden');
+            });
+        });
+
+        deleteButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const kdSpesialis = this.getAttribute('data-kd-spesialis');
+
+                fetch(`/spesialis/${kdSpesialis}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Data berhasil dihapus');
+                        location.reload();
+                    } else {
+                        console.error('Gagal menghapus data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Terjadi kesalahan:', error);
+                });
+            });
+        });
+
+        addButton.addEventListener('click', function () {
+            addFormModal.classList.remove('hidden');
+        });
+
+        closeModalButton.addEventListener('click', function () {
+            editFormModal.classList.add('hidden');
+        });
+
+        closeAddModalButton.addEventListener('click', function () {
+            addFormModal.classList.add('hidden');
+        });
+
+        const editForm = document.getElementById('editForm');
+        editForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch(`/spesialis/${formData.get('kd_spesialis')}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    spesialis: formData.get('spesialis'),
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Data berhasil diperbarui');
+                    location.reload();
+                } else {
+                    console.error('Gagal memperbarui data');
+                }
+            })
+            .catch(error => {
+                console.error('Terjadi kesalahan:', error);
+            });
+            editFormModal.classList.add('hidden');
+        });
+
+        const addForm = document.getElementById('addForm');
+        addForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('/spesialis/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    kd_spesialis: formData.get('kd_spesialis'),
+                    spesialis: formData.get('spesialis'),
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'spesialis added successfully') {
+                    console.log('Data berhasil ditambahkan');
+                    location.reload();
+                } else {
+                    console.error('Gagal menambahkan data');
+                }
+            })
+            .catch(error => {
+                console.error('Terjadi kesalahan:', error);
+            });
+            addFormModal.classList.add('hidden');
+        });
+    });
+</script>
+{% endblock %}

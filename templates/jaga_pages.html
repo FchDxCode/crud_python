@@ -1,0 +1,218 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="relative overflow-x-auto shadow-md">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th scope="col" class="px-6 py-3">Kode Dokter</th>
+                <th scope="col" class="px-6 py-3">Hari</th>
+                <th scope="col" class="px-6 py-3">Jam Mulai</th>
+                <th scope="col" class="px-6 py-3">Jam Selesai</th>
+                <th scope="col" class="px-6 py-3">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for j in jaga %}
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ j.kd_dokter }}</td>
+                <td class="px-6 py-4">{{ j.hari }}</td>
+                <td class="px-6 py-4">{{ j.jam_mulai }}</td>
+                <td class="px-6 py-4">{{ j.jam_selesai }}</td>
+                <td class="px-6 py-4 text-right flex flex-nowrap">
+                    <button class="bg-latte px-3 py-1 rounded-lg text-black mr-2 edit-button"
+                        data-kd-dokter="{{ j.kd_dokter }}"
+                        data-hari="{{ j.hari }}"
+                        data-jam-mulai="{{ j.jam_mulai }}"
+                        data-jam-selesai="{{ j.jam_selesai }}">
+                        Edit
+                    </button>
+                    <button class="bg-red-600 text-white px-3 py-1 rounded-lg delete-button" data-kd-dokter="{{ j.kd_dokter }}">Hapus</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Button -->
+<button id="add-button" class="bg-green-500 text-white px-4 py-2 rounded-lg mt-4">Tambah</button>
+
+<!-- Edit Form Modal -->
+<div id="editFormModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-500 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-8 rounded-md max-w-md w-full">
+        <h2 class="text-xl font-semibold mb-4">Edit Jaga</h2>
+        <form id="editForm" class="space-y-4">
+            <input type="hidden" name="kd_dokter" id="kd_dokter">
+            <div>
+                <label for="hari" class="block font-medium">Hari</label>
+                <input type="date" name="hari" id="hari" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="jam_mulai" class="block font-medium">Jam Mulai</label>
+                <input type="time" name="jam_mulai" id="jam_mulai" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="jam_selesai" class="block font-medium">Jam Selesai</label>
+                <input type="time" name="jam_selesai" id="jam_selesai" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <button type="submit" class="bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700">Simpan Perubahan</button>
+                <button id="closeModalButton" type="button" class="ml-2 text-gray-600 font-medium py-2 px-4 rounded-md border border-gray-300 hover:text-gray-800">Tutup</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Form Modal -->
+<div id="addFormModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-500 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-8 rounded-md max-w-md w-full">
+        <h2 class="text-xl font-semibold mb-4">Tambah Jaga</h2>
+        <form id="addForm" class="space-y-4">
+            <div>
+                <label for="kd_dokter_add" class="block font-medium">Kode Dokter</label>
+                <input type="text" name="kd_dokter" id="kd_dokter_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="hari_add" class="block font-medium">Hari</label>
+                <input type="date" name="hari" id="hari_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="jam_mulai_add" class="block font-medium">Jam Mulai</label>
+                <input type="time" name="jam_mulai" id="jam_mulai_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="jam_selesai_add" class="block font-medium">Jam Selesai</label>
+                <input type="time" name="jam_selesai" id="jam_selesai_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <button type="submit" class="bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700">Tambah Jaga</button>
+                <button id="closeAddModalButton" type="button" class="ml-2 text-gray-600 font-medium py-2 px-4 rounded-md border border-gray-300 hover:text-gray-800">Tutup</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editButtons = document.querySelectorAll('.edit-button');
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        const addButton = document.getElementById('add-button');
+        const editFormModal = document.getElementById('editFormModal');
+        const addFormModal = document.getElementById('addFormModal');
+        const closeModalButton = document.getElementById('closeModalButton');
+        const closeAddModalButton = document.getElementById('closeAddModalButton');
+    
+        editButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const kdDokter = this.getAttribute('data-kd-dokter');
+                const hari = this.getAttribute('data-hari');
+                const jamMulai = this.getAttribute('data-jam-mulai');
+                const jamSelesai = this.getAttribute('data-jam-selesai');
+    
+                document.getElementById('kd_dokter').value = kdDokter;
+                document.getElementById('hari').value = hari;
+                document.getElementById('jam_mulai').value = jamMulai;
+                document.getElementById('jam_selesai').value = jamSelesai;
+                editFormModal.classList.remove('hidden');
+            });
+        });
+    
+        deleteButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const kdDokter = this.getAttribute('data-kd-dokter');
+                const hari = this.getAttribute('data-hari');
+    
+                fetch(`/jaga/${kdDokter}/${hari}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Data berhasil dihapus');
+                        location.reload();
+                    } else {
+                        console.error('Gagal menghapus data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Terjadi kesalahan:', error);
+                });
+            });
+        });
+    
+        addButton.addEventListener('click', function () {
+            addFormModal.classList.remove('hidden');
+        });
+    
+        closeModalButton.addEventListener('click', function () {
+            editFormModal.classList.add('hidden');
+        });
+    
+        closeAddModalButton.addEventListener('click', function () {
+            addFormModal.classList.add('hidden');
+        });
+    
+        const editForm = document.getElementById('editForm');
+        editForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+    
+            fetch(`/jaga/${formData.get('kd_dokter')}/${formData.get('hari')}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ 
+                    jam_mulai: formData.get('jam_mulai'),
+                    jam_selesai: formData.get('jam_selesai')
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Data berhasil diperbarui');
+                    location.reload();
+                } else {
+                    console.error('Gagal memperbarui data');
+                }
+            })
+            .catch(error => {
+                console.error('Terjadi kesalahan:', error);
+            });
+            editFormModal.classList.add('hidden');
+        });
+    
+        const addForm = document.getElementById('addForm');
+        addForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+    
+            fetch('/jaga', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    kd_dokter: formData.get('kd_dokter'),
+                    hari: formData.get('hari'),
+                    jam_mulai: formData.get('jam_mulai'),
+                    jam_selesai: formData.get('jam_selesai')
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Jaga added successfully') {
+                    console.log('Data berhasil ditambahkan');
+                    location.reload();
+                } else {
+                    console.error('Gagal menambahkan data');
+                }
+            })
+            .catch(error => {
+                console.error('Terjadi kesalahan:', error);
+            });
+            addFormModal.classList.add('hidden');
+        });
+    });
+    
+</script>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+    <div class="bg-white shadow-md rounded-lg p-4">
+        <h2 class="text-xl font-semibold">Total Patients</h2>
+        <p class="text-gray-500">{{ data.total_patients }}</p>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-4">
+        <h2 class="text-xl font-semibold">Total Doctors</h2>
+        <p class="text-gray-500">{{ data.total_doctors }}</p>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-4">
+        <h2 class="text-xl font-semibold">Total Specialists</h2>
+        <p class="text-gray-500">{{ data.total_specialists }}</p>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-4">
+        <h2 class="text-xl font-semibold">Total Recovered Patients</h2>
+        <p class="text-gray-500">{{ data.total_recovered_patients }}</p>
+    </div>
+
+</div>
+
+<div class="mt-6">
+    <h2 class="text-2xl font-semibold mb-4">Statistics</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <div class="bg-white shadow-md rounded-lg p-4">
+            <h3 class="text-lg font-semibold">Sick Patients</h3>
+            <canvas id="sickPatientsChart" class="mt-4"></canvas>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-4">
+            <h3 class="text-lg font-semibold">Recovered Patients</h3>
+            <canvas id="recoveredPatientsChart" class="mt-4"></canvas>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const sickPatientsCtx = document.getElementById('sickPatientsChart').getContext('2d');
+    const recoveredPatientsCtx = document.getElementById('recoveredPatientsChart').getContext('2d');
+
+    const sickPatientsData = {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+        datasets: [{
+            label: 'Sick Patients',
+            data: [20, 25, 30, 22, 18, 15],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    const recoveredPatientsData = {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+        datasets: [{
+            label: 'Recovered Patients',
+            data: [5, 8, 12, 15, 20, 25],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    new Chart(sickPatientsCtx, {
+        type: 'line',
+        data: sickPatientsData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    new Chart(recoveredPatientsCtx, {
+        type: 'line',
+        data: recoveredPatientsData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

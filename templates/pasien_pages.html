@@ -1,0 +1,273 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="relative overflow-x-auto shadow-md">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th scope="col" class="px-6 py-3">Kode Pasien</th>
+                <th scope="col" class="px-6 py-3">Nama Pasien</th>
+                <th scope="col" class="px-6 py-3">Alamat Pasien</th>
+                <th scope="col" class="px-6 py-3">Umur Pasien</th>
+                <th scope="col" class="px-6 py-3">Jenis Kelamin</th>
+                <th scope="col" class="px-6 py-3">Telepon</th>
+                <th scope="col" class="px-6 py-3">Spesialis</th>
+                <th scope="col" class="px-6 py-3">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pasien %}
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ p.kd_pasien }}</td>
+                <td class="px-6 py-4">{{ p.nama_pasien }}</td>
+                <td class="px-6 py-4">{{ p.alamat_pasien }}</td>
+                <td class="px-6 py-4">{{ p.umur_pasien }}</td>
+                <td class="px-6 py-4">{{ p.sex }}</td>
+                <td class="px-6 py-4">{{ p.telepon }}</td>
+                <td class="px-6 py-4">{{ p.spesialis }}</td>
+                <td class="px-6 py-4 text-right flex flex-nowrap">
+                    <button class="bg-latte px-3 py-1 rounded-lg text-black mr-2 edit-button"
+                        data-kd-pasien="{{ p.kd_pasien }}"
+                        data-nama-pasien="{{ p.nama_pasien }}"
+                        data-alamat-pasien="{{ p.alamat_pasien }}"
+                        data-umur-pasien="{{ p.umur_pasien }}"
+                        data-jenis-kelamin="{{ p.sex }}"
+                        data-telepon="{{ p.telepon }}"
+                        data-spesialis="{{ p.spesialis }}">
+                        Edit
+                    </button>
+                    <button class="bg-red-600 text-white px-3 py-1 rounded-lg delete-button" data-kd-pasien="{{ p.kd_pasien }}">Hapus</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Button -->
+<button id="add-button" class="bg-green-500 text-white px-4 py-2 rounded-lg mt-4">Tambah</button>
+
+<!-- Edit Form Modal -->
+<div id="editFormModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-500 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-8 rounded-md max-w-md w-full">
+        <h2 class="text-xl font-semibold mb-4">Edit Pasien</h2>
+        <form id="editForm" class="space-y-4">
+            <input type="hidden" name="kd_pasien" id="kd_pasien">
+            <div>
+                <label for="nama_pasien" class="block font-medium">Nama Pasien</label>
+                <input type="text" name="nama_pasien" id="nama_pasien" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="alamat_pasien" class="block font-medium">Alamat Pasien</label>
+                <input type="text" name="alamat_pasien" id="alamat_pasien" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="umur_pasien" class="block font-medium">Umur Pasien</label>
+                <input type="text" name="umur_pasien" id="umur_pasien" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="jenis_kelamin" class="block font-medium">Jenis Kelamin</label>
+                <div class="flex items-center">
+                    <input id="jenis_kelamin_laki" type="radio" name="jenis_kelamin" value="L" class="w-4 h-4 border-gray-300">
+                    <label for="jenis_kelamin_laki" class="ms-2 text-sm font-medium text-gray-900 pr-3">Laki Laki</label>
+                    <input id="jenis_kelamin_perempuan" type="radio" name="jenis_kelamin" value="P" class="w-4 h-4 border-gray-300">
+                    <label for="jenis_kelamin_perempuan" class="ms-2 text-sm font-medium text-gray-900">Perempuan</label>
+                </div>
+            </div>
+            <div>
+                <label for="telepon" class="block font-medium">Telepon</label>
+                <input type="text" name="telepon" id="telepon" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="spesialis" class="block font-medium">Spesialis</label>
+                <input type="text" name="spesialis" id="spesialis" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <button type="submit" class="bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700">Simpan Perubahan</button>
+                <button id="closeModalButton" type="button" class="ml-2 text-gray-600 font-medium py-2 px-4 rounded-md border border-gray-300 hover:text-gray-800">Tutup</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Form Modal -->
+<div id="addFormModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-500 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-8 rounded-md max-w-md w-full">
+        <h2 class="text-xl font-semibold mb-4">Tambah Pasien</h2>
+        <form id="addForm" class="space-y-4">
+            <div>
+                <label for="kd_pasien_add" class="block font-medium">Kode Pasien</label>
+                <input type="text" name="kd_pasien" id="kd_pasien_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="nama_pasien_add" class="block font-medium">Nama Pasien</label>
+                <input type="text" name="nama_pasien" id="nama_pasien_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="alamat_pasien_add" class="block font-medium">Alamat Pasien</label>
+                <input type="text" name="alamat_pasien" id="alamat_pasien_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="umur_pasien_add" class="block font-medium">Umur Pasien</label>
+                <input type="text" name="umur_pasien" id="umur_pasien_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="jenis_kelamin_add" class="block font-medium">Jenis Kelamin</label>
+                <div class="flex items-center">
+                    <input id="jenis_kelamin_laki_add" type="radio" name="jenis_kelamin" value="L" class="w-4 h-4 border-gray-300">
+                    <label for="jenis_kelamin_laki_add" class="ms-2 text-sm font-medium text-gray-900 pr-3">Laki Laki</label>
+                    <input id="jenis_kelamin_perempuan_add" type="radio" name="jenis_kelamin" value="P" class="w-4 h-4 border-gray-300">
+                    <label for="jenis_kelamin_perempuan_add" class="ms-2 text-sm font-medium text-gray-900">Perempuan</label>
+                </div>
+            </div>
+            <div>
+                <label for="telepon_add" class="block font-medium">Telepon</label>
+                <input type="text" name="telepon" id="telepon_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <label for="spesialis_add" class="block font-medium">Spesialis</label>
+                <input type="text" name="spesialis" id="spesialis_add" class="w-full border-gray-300 rounded-md p-2" required>
+            </div>
+            <div>
+                <button type="submit" class="bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700">Tambah Pasien</button>
+                <button id="closeAddModalButton" type="button" class="ml-2 text-gray-600 font-medium py-2 px-4 rounded-md border border-gray-300 hover:text-gray-800">Tutup</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editButtons = document.querySelectorAll('.edit-button');
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        const addButton = document.getElementById('add-button');
+        const editFormModal = document.getElementById('editFormModal');
+        const addFormModal = document.getElementById('addFormModal');
+        const closeModalButton = document.getElementById('closeModalButton');
+        const closeAddModalButton = document.getElementById('closeAddModalButton');
+
+        editButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const kdPasien = this.getAttribute('data-kd-pasien');
+                const namaPasien = this.getAttribute('data-nama-pasien');
+                const alamatPasien = this.getAttribute('data-alamat-pasien');
+                const umurPasien = this.getAttribute('data-umur-pasien');
+                const jenisKelamin = this.getAttribute('data-jenis-kelamin');
+                const telepon = this.getAttribute('data-telepon');
+                const spesialis = this.getAttribute('data-spesialis');
+
+                document.getElementById('kd_pasien').value = kdPasien;
+                document.getElementById('nama_pasien').value = namaPasien;
+                document.getElementById('alamat_pasien').value = alamatPasien;
+                document.getElementById('umur_pasien').value = umurPasien;
+                document.getElementById('jenis_kelamin_' + (jenisKelamin == 'L' ? 'laki' : 'perempuan')).checked = true;
+                document.getElementById('telepon').value = telepon;
+                document.getElementById('spesialis').value = spesialis;
+
+                editFormModal.classList.remove('hidden');
+            });
+        });
+
+        deleteButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const kdPasien = this.getAttribute('data-kd-pasien');
+
+                fetch(`/pasien/${kdPasien}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Data berhasil dihapus');
+                        location.reload();
+                    } else {
+                        console.error('Gagal menghapus data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Terjadi kesalahan:', error);
+                });
+            });
+        });
+
+        addButton.addEventListener('click', function () {
+            addFormModal.classList.remove('hidden');
+        });
+
+        closeModalButton.addEventListener('click', function () {
+            editFormModal.classList.add('hidden');
+        });
+
+        closeAddModalButton.addEventListener('click', function () {
+            addFormModal.classList.add('hidden');
+        });
+
+        const editForm = document.getElementById('editForm');
+        editForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch(`/pasien/${formData.get('kd_pasien')}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ 
+                    nama_pasien: formData.get('nama_pasien'),
+                    alamat_pasien: formData.get('alamat_pasien'),
+                    umur_pasien: formData.get('umur_pasien'),
+                    jenis_kelamin: formData.get('jenis_kelamin'),
+                    telepon: formData.get('telepon'),
+                    spesialis: formData.get('spesialis')
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Data berhasil diperbarui');
+                    location.reload();
+                } else {
+                    console.error('Gagal memperbarui data');
+                }
+            })
+            .catch(error => {
+                console.error('Terjadi kesalahan:', error);
+            });
+            editFormModal.classList.add('hidden');
+        });
+
+        const addForm = document.getElementById('addForm');
+        addForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('/pasien', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    kd_pasien: formData.get('kd_pasien'),
+                    nama_pasien: formData.get('nama_pasien'),
+                    alamat_pasien: formData.get('alamat_pasien'),
+                    umur_pasien: formData.get('umur_pasien'),
+                    jenis_kelamin: formData.get('jenis_kelamin'),
+                    telepon: formData.get('telepon'),
+                    spesialis: formData.get('spesialis')
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Pasien added successfully') {
+                    console.log('Data berhasil ditambahkan');
+                    location.reload();
+                } else {
+                    console.error('Gagal menambahkan data');
+                }
+            })
+            .catch(error => {
+                console.error('Terjadi kesalahan:', error);
+            });
+            addFormModal.classList.add('hidden');
+        });
+    });
+</script>
+{% endblock %}
